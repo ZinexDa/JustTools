@@ -635,6 +635,14 @@ downloadBtn.addEventListener("click", async () => {
   }
 });
 
+listen<string>("download-error", (event) => {
+  const msg = event.payload;
+  console.error("Download Error:", msg);
+  downloadProgressSection.classList.add("hidden");
+  downloadBtn.disabled = false;
+  showToast(`Download failed:\n${msg}`);
+});
+
 listen<{ progress_percent: number; speed: string; eta: string }>("download-progress", (event) => {
   const { progress_percent, speed, eta } = event.payload;
   const pct = Math.min(100, Math.round(progress_percent));
