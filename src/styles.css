@@ -992,6 +992,83 @@ button {
 }
 
 /* =====================
+   update widget
+   ===================== */
+.update-notification {
+  position: fixed;
+  top: 48px;
+  right: 16px;
+  z-index: 9999;
+  background-color: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  transform: translateX(120%);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  min-width: 250px;
+}
+
+[data-theme="light"] .update-notification {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.update-notification:not(.hidden) {
+  transform: translateX(0);
+}
+
+.update-state {
+  display: none;
+  align-items: center;
+  gap: 10px;
+}
+
+.update-state.active {
+  display: flex;
+}
+
+.update-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.update-title {
+  font-weight: 500;
+}
+
+.update-version {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.update-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.small-btn {
+  padding: 6px 12px;
+  min-height: unset;
+  height: auto;
+  font-size: 0.8rem;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* =====================
    utilities
    ===================== */
 .hidden {

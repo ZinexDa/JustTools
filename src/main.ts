@@ -2,7 +2,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
-import { open, save, message, ask } from "@tauri-apps/plugin-dialog";
+import { open, save } from "@tauri-apps/plugin-dialog";
 import { check } from "@tauri-apps/plugin-updater";
 import { relaunch } from "@tauri-apps/plugin-process";
 
@@ -227,36 +227,90 @@ themePillToggle.addEventListener("keydown", (e) => {
 // =====================
 // updater
 // =====================
-async function checkForUpdates() {
+const updateNotification = document.getElementById("update-notification") as HTMLDivElement;
+const stateChecking = document.getElementById("update-state-checking") as HTMLDivElement;
+const stateAvailable = document.getElementById("update-state-available") as HTMLDivElement;
+const stateDownloading = document.getElementById("update-state-downloading") as HTMLDivElement;
+const updateVersionText = document.getElementById("update-version-text") as HTMLSpanElement;
+const updateInstallBtn = document.getElementById("update-install-btn") as HTMLButtonElement;
+const updateCancelBtn = document.getElementById("update-cancel-btn") as HTMLButtonElement;
+
+function setUpdateState(state: "checking" | "available" | "downloading") {
+  stateChecking.classList.remove("active");
+  stateAvailable.classList.remove("active");
+  stateDownloading.classList.remove("active");
+  
+  if (state === "checking") stateChecking.classList.add("active");
+  else if (state === "available") stateAvailable.classList.add("active");
+  else if (state === "downloading") stateDownloading.classList.add("active");
+}
+
+let activeUpdate: any = null;
+
+async function doUpdateCheck(manual = false) {
   if (checkUpdatesBtn) {
-    const originalText = checkUpdatesBtn.textContent;
     checkUpdatesBtn.textContent = "Checking...";
     checkUpdatesBtn.disabled = true;
+  }
+  
+  updateNotification.classList.remove("hidden");
+  setUpdateState("checking");
 
-    try {
-      const update = await check();
-      if (update) {
-        const yes = await ask(`Update to ${update.version} is available!\n\nRelease notes: ${update.body}\n\nInstall now?`, { title: "Update Available", kind: "info" });
-        if (yes) {
-          checkUpdatesBtn.textContent = "Downloading & Installing...";
-          await update.downloadAndInstall();
-          await relaunch();
-        }
-      } else {
-        await message("You are on the latest version.", { title: "No Update Available", kind: "info" });
+  try {
+    const update = await check();
+    if (update) {
+      activeUpdate = update;
+      updateVersionText.textContent = `v${update.version}`;
+      setUpdateState("available");
+    } else {
+      if (manual) {
+        showToast("You are on the latest version.");
       }
-    } catch (err) {
-      console.error(err);
-      await message(`Failed to check for updates: ${err}`, { title: "Update Error", kind: "error" });
-    } finally {
-      checkUpdatesBtn.textContent = originalText;
+      setTimeout(() => {
+        updateNotification.classList.add("hidden");
+      }, 2000);
+    }
+  } catch (err) {
+    console.error(err);
+    if (manual) {
+      showToast(`Failed to check for updates: ${err}`);
+    }
+    setTimeout(() => {
+      updateNotification.classList.add("hidden");
+    }, 2000);
+  } finally {
+    if (checkUpdatesBtn) {
+      checkUpdatesBtn.textContent = "Check for updates";
       checkUpdatesBtn.disabled = false;
     }
   }
 }
 
+updateCancelBtn.addEventListener("click", () => {
+  updateNotification.classList.add("hidden");
+});
+
+updateInstallBtn.addEventListener("click", async () => {
+  if (!activeUpdate) return;
+  setUpdateState("downloading");
+  
+  try {
+    await activeUpdate.downloadAndInstall();
+    await relaunch();
+  } catch (err) {
+    console.error("Failed to install update:", err);
+    showToast(`Failed to install update: ${err}`);
+    updateNotification.classList.add("hidden");
+  }
+});
+
+// Run automatically on startup
+setTimeout(() => {
+  doUpdateCheck(false);
+}, 500);
+
 if (checkUpdatesBtn) {
-  checkUpdatesBtn.addEventListener("click", checkForUpdates);
+  checkUpdatesBtn.addEventListener("click", () => doUpdateCheck(true));
 }
 
 // =====================
