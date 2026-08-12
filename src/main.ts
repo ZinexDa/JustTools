@@ -2,7 +2,9 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
-import { open, save } from "@tauri-apps/plugin-dialog";
+import { open, save, message, ask } from "@tauri-apps/plugin-dialog";
+import { check } from "@tauri-apps/plugin-updater";
+import { relaunch } from "@tauri-apps/plugin-process";
 
 // =====================
 // titlebar controls
@@ -185,6 +187,7 @@ const convertProgressTime = document.getElementById("convert-progress-time") as 
 const outputDirInput = document.getElementById("output-dir-input") as HTMLInputElement;
 const browseOutputDirBtn = document.getElementById("browse-output-dir-btn") as HTMLButtonElement;
 const alwaysAskToggle = document.getElementById("always-ask-toggle") as HTMLInputElement;
+const checkUpdatesBtn = document.getElementById("check-updates-btn") as HTMLButtonElement;
 
 // =====================
 // state
@@ -220,6 +223,41 @@ themePillToggle.addEventListener("keydown", (e) => {
     applyTheme(settings.theme);
   }
 });
+
+// =====================
+// updater
+// =====================
+async function checkForUpdates() {
+  if (checkUpdatesBtn) {
+    const originalText = checkUpdatesBtn.textContent;
+    checkUpdatesBtn.textContent = "Checking...";
+    checkUpdatesBtn.disabled = true;
+
+    try {
+      const update = await check();
+      if (update) {
+        const yes = await ask(`Update to ${update.version} is available!\n\nRelease notes: ${update.body}\n\nInstall now?`, { title: "Update Available", kind: "info" });
+        if (yes) {
+          checkUpdatesBtn.textContent = "Downloading & Installing...";
+          await update.downloadAndInstall();
+          await relaunch();
+        }
+      } else {
+        await message("You are on the latest version.", { title: "No Update Available", kind: "info" });
+      }
+    } catch (err) {
+      console.error(err);
+      await message(`Failed to check for updates: ${err}`, { title: "Update Error", kind: "error" });
+    } finally {
+      checkUpdatesBtn.textContent = originalText;
+      checkUpdatesBtn.disabled = false;
+    }
+  }
+}
+
+if (checkUpdatesBtn) {
+  checkUpdatesBtn.addEventListener("click", checkForUpdates);
+}
 
 // =====================
 // tab navigation

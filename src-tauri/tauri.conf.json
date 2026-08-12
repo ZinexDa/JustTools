@@ -37,5 +37,13 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "ТВОЙ_PUBLIC_KEY_ИЗ_ШАГА_2",
+      "endpoints": [
+        "https://github.com/ZinexDa/JustTools/releases/latest/download/latest.json"
+      ]
+    }
   }
 }
