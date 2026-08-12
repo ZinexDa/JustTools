@@ -27,7 +27,6 @@ fn format_yt_dlp_error(stderr: &[u8]) -> String {
     let raw_error = String::from_utf8_lossy(stderr);
     let mut user_msg = String::new();
     
-    // Check for common signs of anti-bot measures or outdated extractors
     if raw_error.contains("Sign in to confirm") 
         || raw_error.contains("Video unavailable")
         || raw_error.contains("Requested format is not available") 
@@ -43,7 +42,6 @@ fn format_yt_dlp_error(stderr: &[u8]) -> String {
 
     user_msg.push_str("\nTry updating yt-dlp to the latest version via the Settings tab.");
     
-    // Optionally include original error detail for debug purposes locally (or just return the friendly string)
     format!("{}\n\nTechnical details:\n{}", user_msg, raw_error.trim())
 }
 
@@ -117,8 +115,6 @@ async fn download_media(
     let progress_regex = Regex::new(r"\[download\]\s+([\d\.]+)\%\s+of.*?at\s+([\d\.\w/]+)(?:\s+ETA\s+([\d:]+))?").unwrap();
 
     tauri::async_runtime::spawn(async move {
-        // Collect stderr to optionally emit an error object containing our formatted message.
-        // Wait for child events to finish
         let mut stderr_acc = Vec::new();
         let mut child_failed = false;
         
@@ -217,7 +213,6 @@ async fn convert_local_file(
             if let CommandEvent::Stderr(line_bytes) = event {
                 let line = String::from_utf8_lossy(&line_bytes);
                 
-                // Parse duration if we haven't got it yet
                 if total_duration == 0.0 {
                     if let Some(caps) = duration_regex.captures(&line) {
                         if let Some(dur_str) = caps.get(1) {
@@ -228,7 +223,6 @@ async fn convert_local_file(
                     }
                 }
                 
-                // Parse progress time
                 if let Some(caps) = time_regex.captures(&line) {
                     if let Some(time_str) = caps.get(1) {
                         let t_str = time_str.as_str();
