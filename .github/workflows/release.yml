@@ -51,17 +51,15 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
 
-      # - name: Setup sidecar binaries (yt-dlp and ffmpeg for Windows)
-      #   shell: pwsh
-      #   run: |
-      #     New-Item -ItemType Directory -Force -Path src-tauri/binaries
-      #     # Add scripts or commands here to download your sidecar binaries to src-tauri/binaries
-      #     # Example for yt-dlp:
-      #     # Invoke-WebRequest -Uri "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe" -OutFile "src-tauri/binaries/yt-dlp-x86_64-pc-windows-msvc.exe"
-      #     # Example for ffmpeg:
-      #     # Invoke-WebRequest -Uri "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -OutFile "ffmpeg.zip"
-      #     # Expand-Archive ffmpeg.zip -DestinationPath .
-      #     # Move-Item "ffmpeg-master-latest-win64-gpl/bin/ffmpeg.exe" "src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe"
+      - name: Setup sidecar binaries
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/binaries
+          Invoke-WebRequest -Uri "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe" -OutFile "src-tauri/binaries/yt-dlp-x86_64-pc-windows-msvc.exe"
+          Invoke-WebRequest -Uri "https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2024-02-28-13-08/ffmpeg-N-113801-g2e8bb2a792-win64-gpl.zip" -OutFile "ffmpeg.zip"
+          Expand-Archive -Path "ffmpeg.zip" -DestinationPath "ffmpeg_temp"
+          $bin = Get-ChildItem -Path "ffmpeg_temp" -Filter "ffmpeg.exe" -Recurse | Select-Object -First 1
+          Copy-Item $bin.FullName "src-tauri/binaries/ffmpeg-x86_64-pc-windows-msvc.exe"
 
       - name: Build Tauri app
         uses: tauri-apps/tauri-action@v0
@@ -73,6 +71,6 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: "JustTools ${{ github.ref_name }}"
           releaseBody: "See the assets to download this version and install."
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.platform == 'windows-latest' && '' || '' }}
