@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>just tools</title>
+  </head>
+  <body>
+    <!-- Titlebar -->
+    <div class="titlebar" data-tauri-drag-region>
+      <div class="titlebar-logo" data-tauri-drag-region>
+        just tools
+      </div>
+      <div class="titlebar-actions">
+        <button class="titlebar-button minimize" id="titlebar-minimize" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="12" x2="20" y2="12"></line></svg>
+        </button>
+        <button class="titlebar-button maximize" id="titlebar-maximize" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+        </button>
+        <button class="titlebar-button close" id="titlebar-close" tabindex="-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="app-layout">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <h1>just tools</h1>
+        </div>
+        <nav class="sidebar-nav">
+          <button class="nav-item active" data-tab="url-downloader">
+            <span class="nav-icon">
+              <!-- Download / Globe icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </span>
+            URL downloader
+          </button>
+          <button class="nav-item" data-tab="local-converter">
+            <span class="nav-icon">
+              <!-- Repeat / Convert icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="17 1 21 5 17 9"></polyline>
+                <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                <polyline points="7 23 3 19 7 15"></polyline>
+                <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+              </svg>
+            </span>
+            local converter
+          </button>
+          <button class="nav-item" data-tab="settings">
+            <span class="nav-icon">
+              <!-- Sliders / Settings icon -->
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="21" x2="4" y2="14"></line>
+                <line x1="4" y1="10" x2="4" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12" y2="3"></line>
+                <line x1="20" y1="21" x2="20" y2="16"></line>
+                <line x1="20" y1="12" x2="20" y2="3"></line>
+                <line x1="1" y1="14" x2="7" y2="14"></line>
+                <line x1="9" y1="8" x2="15" y2="8"></line>
+                <line x1="17" y1="16" x2="23" y2="16"></line>
+              </svg>
+            </span>
+            settings
+          </button>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div class="tab-contents">
+          <!-- TAB 1: URL DOWNLOADER -->
+          <div id="tab-url-downloader" class="tab-view active">
+            <header class="tab-header">
+              <h2>URL Downloader</h2>
+              <p>fetch and download media via yt-dlp.</p>
+            </header>
+            
+            <section class="url-input-section">
+              <form id="fetch-form" class="url-form">
+                <div class="input-row">
+                  <div class="input-wrapper">
+                    <svg class="link-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                    <input type="url" id="media-url-input" placeholder="paste link here..." autocomplete="off" />
+                    <button type="button" id="clear-url-btn" class="clear-url-btn hidden" aria-label="Clear URL">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
+                    </button>
+                    <!-- Status badge shown inline -->
+                    <div id="url-status-badge" class="url-status-badge hidden"></div>
+                  </div>
+                  <button type="submit" id="fetch-btn" class="primary-btn">
+                    <span class="btn-text">fetch</span>
+                    <svg class="loader-icon hidden" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <line x1="12" y1="2" x2="12" y2="6"></line>
+                      <line x1="12" y1="18" x2="12" y2="22"></line>
+                      <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                      <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                      <line x1="2" y1="12" x2="6" y2="12"></line>
+                      <line x1="18" y1="12" x2="22" y2="12"></line>
+                      <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                      <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+                    </svg>
+                  </button>
+                </div>
+
+                <!-- Platform selector row -->
+                <div class="platform-row">
+                  <label class="platform-label" for="platform-select">Platform</label>
+                  <div class="platform-select-wrapper">
+                    <svg class="platform-select-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <select id="platform-select" class="platform-select">
+                      <option value="auto">auto-detect</option>
+                      <option value="youtube">YouTube</option>
+                      <option value="twitch">Twitch</option>
+                      <option value="tiktok">TikTok</option>
+                      <option value="soundcloud">SoundCloud</option>
+                      <option value="twitter">Twitter / X</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <svg class="platform-chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                  </div>
+                </div>
+              </form>
+            </section>
+
+            <section id="media-preview-section" class="preview-section hidden">
+              <div class="media-card">
+                <div class="thumbnail-container">
+                  <img id="media-thumbnail" src="" alt="Media Thumbnail" />
+                  <span id="media-duration" class="duration-badge"></span>
+                </div>
+                <div class="media-info">
+                  <h2 id="media-title" class="title" title=""></h2>
+                  <p id="media-channel" class="channel"></p>
+                </div>
+              </div>
+
+              <div class="action-panel">
+                <h3>Quality</h3>
+                <div class="quality-selector" id="quality-selector">
+                  <!-- Format options injected here -->
+                </div>
+                
+                <button id="download-btn" class="action-btn primary-btn" disabled>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                  Download
+                </button>
+              </div>
+            </section>
+
+            <section id="download-progress-section" class="progress-section hidden">
+              <div class="progress-header">
+                <span class="status-text">Downloading...</span>
+                <span id="download-progress-percentage" class="percentage-text tabular-nums">0%</span>
+              </div>
+              <div class="progress-track">
+                <div id="download-progress-fill" class="progress-fill"></div>
+              </div>
+              <div class="progress-details">
+                <span id="download-progress-speed" class="detail-text tabular-nums">-- MiB/s</span>
+                <span id="download-progress-eta" class="detail-text tabular-nums">ETA: --:--</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- TAB 2: LOCAL CONVERTER -->
+          <div id="tab-local-converter" class="tab-view">
+            <header class="tab-header">
+              <h2>Local Converter</h2>
+              <p>Convert local video and audio files using FFmpeg.</p>
+            </header>
+            
+            <section class="upload-section">
+              <div id="drop-zone" class="drop-zone">
+                <div class="drop-icon-container">
+                  <svg class="drop-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <svg class="drop-success-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6 9 17l-5-5"></path>
+                  </svg>
+                </div>
+                <div class="drop-text">drag & drop a media file here</div>
+                <div class="drop-subtext">supports .mp4, .mkv, .avi, .webm, .mp3, .wav</div>
+                <button id="browse-btn" class="secondary-btn">browse files</button>
+              </div>
+              <div id="selected-file-info" class="selected-file-info hidden">
+                <span class="file-name" id="selected-file-name">filename.mp4</span>
+                <button id="clear-file-btn" class="icon-btn" aria-label="clear selected file">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            </section>
+
+            <section id="convert-options-section" class="convert-options-section hidden">
+              <div class="action-panel">
+                <h3>Target Format</h3>
+                <div class="quality-selector" id="target-format-selector">
+                  <button class="quality-pill active" data-format="mp4">MP4</button>
+                  <button class="quality-pill" data-format="mkv">MKV</button>
+                  <button class="quality-pill" data-format="mp3">MP3</button>
+                  <button class="quality-pill" data-format="wav">WAV</button>
+                  <button class="quality-pill" data-format="gif">GIF</button>
+                </div>
+                <button id="convert-btn" class="action-btn primary-btn">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="17 1 21 5 17 9"></polyline>
+                    <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+                    <polyline points="7 23 3 19 7 15"></polyline>
+                    <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+                  </svg>
+                  convert file
+                </button>
+              </div>
+            </section>
+
+            <section id="convert-progress-section" class="progress-section hidden">
+              <div class="progress-header">
+                <span class="status-text">converting...</span>
+                <span id="convert-progress-percentage" class="percentage-text tabular-nums">0%</span>
+              </div>
+              <div class="progress-track">
+                <div id="convert-progress-fill" class="progress-fill"></div>
+              </div>
+              <div class="progress-details">
+                <span id="convert-progress-time" class="detail-text tabular-nums">Time: --:--:--</span>
+              </div>
+            </section>
+          </div>
+
+          <!-- TAB 3: SETTINGS -->
+          <div id="tab-settings" class="tab-view">
+            <header class="tab-header">
+              <h2>settings</h2>
+              <p>configure app preferences.</p>
+            </header>
+            <div class="settings-content">
+
+              <!-- Output Directory -->
+              <div class="setting-item setting-item--column">
+                <div class="setting-info">
+                  <h3>default output directory</h3>
+                  <p>where downloaded and converted files are saved.</p>
+                </div>
+                <div class="setting-path-row">
+                  <div class="setting-path-input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="setting-path-icon">
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <input type="text" id="output-dir-input" class="setting-path-field" placeholder="~/Downloads" readonly />
+                  </div>
+                  <button id="browse-output-dir-btn" class="secondary-btn browse-dir-btn">Browse…</button>
+                </div>
+              </div>
+
+              <!-- Always Ask Toggle -->
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h3>always ask where to save</h3>
+                  <p>show a save dialog before every download or conversion.</p>
+                </div>
+                <label class="toggle-switch" for="always-ask-toggle" aria-label="Always ask where to save">
+                  <input type="checkbox" id="always-ask-toggle" checked />
+                  <span class="toggle-track">
+                    <span class="toggle-thumb"></span>
+                  </span>
+                </label>
+              </div>
+
+              <!-- Theme info -->
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h3>appearance</h3>
+                  <p>switch between light and dark mode.</p>
+                </div>
+                <div class="theme-pill-toggle" id="theme-pill-toggle" role="button" tabindex="0" aria-label="Toggle Theme">
+                  <div class="theme-pill-track">
+                    <div class="theme-pill-knob">
+                      <svg class="theme-icon-sun" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                      </svg>
+                      <svg class="theme-icon-moon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Backend info -->
+              <div class="setting-item">
+                <div class="setting-info">
+                  <h3>backend</h3>
+                  <p>powered by Tauri v2, yt-dlp, and FFmpeg.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
